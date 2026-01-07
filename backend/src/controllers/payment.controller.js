@@ -169,3 +169,61 @@ exports.createPayment = async (req, res) => {
     });
   }
 };
+
+exports.getPaymentById = async (req, res) => {
+  const { paymentId } = req.params;
+  const merchantId = req.merchant.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT id, order_id, amount, currency, method,
+              vpa, card_network, card_last4,
+              status, created_at, updated_at
+       FROM payments
+       WHERE id = $1 AND merchant_id = $2`,
+      [paymentId, merchantId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND_ERROR",
+          description: "Payment not found",
+        },
+      });
+    }
+
+    const p = result.rows[0];
+
+    // Build response dynamically based on method
+    const response = {
+      id: p.id,
+      order_id: p.order_id,
+      amount: p.amount,
+      currency: p.currency,
+      method: p.method,
+      status: p.status,
+      created_at: p.created_at,
+      updated_at: p.updated_at,
+    };
+
+    if (p.method === "upi") {
+      response.vpa = p.vpa;
+    }
+
+    if (p.method === "card") {
+      response.card_network = p.card_network;
+      response.card_last4 = p.card_last4;
+    }
+
+    return res.status(200).json(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: {
+        code: "INTERNAL_SERVER_ERROR",
+        description: "Something went wrong",
+      },
+    });
+  }
+};
