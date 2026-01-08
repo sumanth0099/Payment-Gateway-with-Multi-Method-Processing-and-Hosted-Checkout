@@ -10,5 +10,11 @@ export async function getDashboardStats() {
     const res = await fetch("http://localhost:8000/api/v1/dashboard/stats");
     if (!res.ok) throw new Error("Failed to fetch stats");
     return res.json();
-  }
+}
+
+export async function getTransactions() {
+    const res = await fetch("http://localhost:8000/api/v1/dashboard/transactions");
+    if (!res.ok) throw new Error("Failed to fetch transactions");
+    return res.json();
+}
   

@@ -8,4 +8,6 @@ app.use('/', healthRoutes);
 app.use('/api',require("./routes/order.routes"))
 app.use('/api',require("./routes/payment.routes"))
 app.use("/api/v1", require("./routes/dashboard.routes"));
+app.use("/api/v1", require("./routes/transactions.routes"));
+
 module.exports = app;
