@@ -7,4 +7,5 @@ const healthRoutes = require('./routes/health.routes');
 app.use('/', healthRoutes);
 app.use('/api',require("./routes/order.routes"))
 app.use('/api',require("./routes/payment.routes"))
+app.use("/api/v1", require("./routes/dashboard.routes"));
 module.exports = app;
