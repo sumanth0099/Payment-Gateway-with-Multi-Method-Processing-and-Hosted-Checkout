@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTestMerchant } from "../api";
+import { getDashboardStats } from "../api";
 
 export default function Dashboard() {
-  const [merchant, setMerchant] = useState(null);
-  const [error, setError] = useState("");
+  const [data, setData] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,23 +13,44 @@ export default function Dashboard() {
       return;
     }
 
-    getTestMerchant()
-      .then(setMerchant)
-      .catch(() => setError("Failed to load merchant"));
+    getDashboardStats()
+      .then(setData)
+      .catch(console.error);
   }, [navigate]);
 
-  if (error) return <p>{error}</p>;
-  if (!merchant) return <p>Loading...</p>;
+  if (!data) return <p>Loading...</p>;
 
   return (
-    <div style={{ maxWidth: 600, margin: "50px auto" }}>
-      <h2>Merchant Dashboard</h2>
+    <div data-test-id="dashboard" style={{ padding: 30 }}>
+      {/* API Credentials */}
+      <div data-test-id="api-credentials">
+        <div>
+          <label>API Key</label>
+          <span data-test-id="api-key">{data.api_key}</span>
+        </div>
 
-      <h3>API Credentials</h3>
-      <p><strong>ID:</strong> {merchant.id}</p>
-      <p><strong>Email:</strong> {merchant.email}</p>
-      <p><strong>API Key:</strong> {merchant.api_key}</p>
-      <p><strong>Seeded:</strong> {merchant.seeded ? "Yes" : "No"}</p>
+        <div>
+          <label>API Secret</label>
+          <span data-test-id="api-secret">{data.api_secret}</span>
+        </div>
+      </div>
+
+      <hr />
+
+      {/* Stats */}
+      <div data-test-id="stats-container">
+        <div data-test-id="total-transactions">
+          {data.total_transactions}
+        </div>
+
+        <div data-test-id="total-amount">
+          ₹{(data.total_amount / 100).toLocaleString("en-IN")}
+        </div>
+
+        <div data-test-id="success-rate">
+          {data.success_rate}%
+        </div>
+      </div>
     </div>
   );
 }
