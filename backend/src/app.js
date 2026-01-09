@@ -18,10 +18,11 @@ app.use('/api/v1', require('./routes/dashboard.routes')); // /api/v1/dashboard (
 app.use('/api/v1', require('./routes/transactions.routes'));
 
 // Catch-all for undefined routes
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     error: { code: "NOT_FOUND_ERROR", description: "Endpoint not found" }
   });
 });
+
 
 module.exports = app;
