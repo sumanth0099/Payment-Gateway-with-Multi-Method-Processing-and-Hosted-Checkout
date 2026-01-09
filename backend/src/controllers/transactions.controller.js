@@ -1,5 +1,4 @@
-const pool = require("../db");
-
+const pool = require('../config/db');
 exports.getTransactions = async (req, res) => {
   try {
     const merchantId = "550e8400-e29b-41d4-a716-446655440000";

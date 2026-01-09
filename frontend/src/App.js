@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
+import Checkout from "./pages/Checkout"; // Add this
+
 function App() {
   return (
     <BrowserRouter>
@@ -9,6 +11,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/transactions" element={<Transactions />} />
+        <Route path="/checkout" element={<Checkout />} /> {/* Add checkout */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

@@ -1,20 +1,19 @@
-const API_BASE = "http://localhost:8000/api/v1"; // change if needed
+const API_BASE = "http://localhost:8000/api/v1";
 
 export async function getTestMerchant() {
   const res = await fetch(`${API_BASE}/test/merchant`);
-  if (!res.ok) throw new Error("Merchant not found");
+  if (!res.ok) throw new Error(await res.text()); // Better error
   return res.json();
 }
 
 export async function getDashboardStats() {
-    const res = await fetch("http://localhost:8000/api/v1/dashboard/stats");
-    if (!res.ok) throw new Error("Failed to fetch stats");
-    return res.json();
+  const res = await fetch(`${API_BASE}/dashboard/stats`); // Use API_BASE
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 export async function getTransactions() {
-    const res = await fetch("http://localhost:8000/api/v1/dashboard/transactions");
-    if (!res.ok) throw new Error("Failed to fetch transactions");
-    return res.json();
+  const res = await fetch(`${API_BASE}/dashboard/transactions`); // Use API_BASE
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
-  

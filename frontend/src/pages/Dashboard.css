@@ -1,0 +1,162 @@
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .dashboard-header h1 {
+    color: #222;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .transactions-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .transactions-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  }
+  
+  .credentials-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    margin-bottom: 32px;
+  }
+  
+  .credentials-card h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 24px;
+  }
+  
+  .credential-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f8f9ff;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+  }
+  
+  .credential-item label {
+    font-weight: 600;
+    color: #555;
+    min-width: 100px;
+  }
+  
+  .api-value {
+    background: #1e1e1e;
+    color: #00ff88;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    flex: 1;
+    word-break: break-all;
+  }
+  
+  .copy-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  
+  .copy-btn:hover {
+    background: #5a6fd8;
+    transform: scale(1.05);
+  }
+  
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  
+  .stat-card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .stat-number {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  
+  .total-transactions .stat-number { color: #10b981; }
+  .total-amount .stat-number { color: #f59e0b; }
+  .success-rate .stat-number { color: #3b82f6; }
+  
+  .stat-label {
+    color: #666;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .loading-container {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f4f6;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-container { padding: 20px 10px; }
+    .stats-container { grid-template-columns: 1fr; }
+  }
+  

@@ -1,0 +1,282 @@
+/* Checkout.css */
+
+:root {
+    --bg1: #667eea;
+    --bg2: #764ba2;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warn: #f59e0b;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+      "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: var(--text);
+    background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    min-height: 100vh;
+  }
+  
+  .checkout-container {
+    width: 100%;
+    max-width: 520px;
+    margin: 50px auto;
+    padding: 24px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+  }
+  
+  .order-summary {
+    padding: 16px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #f8f9ff;
+    margin-bottom: 18px;
+  }
+  
+  .order-summary h2 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 800;
+  }
+  
+  .order-summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  
+  .order-summary strong,
+  .order-summary span[data-test-id="order-id"] {
+    color: var(--text);
+    font-weight: 700;
+  }
+  
+  .payment-methods {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0 18px;
+  }
+  
+  .method-btn {
+    flex: 1;
+    border: 2px solid var(--border);
+    background: #fff;
+    padding: 12px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    transition: 0.2s ease;
+  }
+  
+  .method-btn:hover {
+    border-color: #c7d2fe;
+    transform: translateY(-1px);
+  }
+  
+  .method-btn.active {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    color: white;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.25);
+  }
+  
+  .method-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .input-group {
+    margin-bottom: 12px;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 14px 14px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s ease;
+  }
+  
+  .input-group input:focus {
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 4px rgba(165, 180, 252, 0.25);
+  }
+  
+  .input-group input:disabled {
+    background: #f9fafb;
+    cursor: not-allowed;
+  }
+  
+  .expiry-cvv {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .expiry-cvv input {
+    padding: 14px 12px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s ease;
+  }
+  
+  .expiry-cvv span {
+    color: var(--muted);
+    font-weight: 700;
+  }
+  
+  .pay-button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    transition: 0.2s ease;
+  }
+  
+  .pay-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 22px rgba(102, 126, 234, 0.28);
+  }
+  
+  .pay-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  /* Processing state */
+  .processing-state {
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: #fff7ed;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .processing-state .spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(0, 0, 0, 0.12);
+    border-top-color: var(--warn);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Result states */
+  .result-state {
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+  
+  .result-state h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+  }
+  
+  .result-state.success {
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+  }
+  
+  .result-state.success h2 {
+    color: var(--success);
+  }
+  
+  .result-state.error {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+  
+  .result-state.error h2 {
+    color: var(--danger);
+  }
+  
+  .retry-button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 2px solid #fecaca;
+    background: white;
+    color: var(--danger);
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .retry-button:hover {
+    background: #fee2e2;
+  }
+  
+  /* Small helpers (if you used these in your component) */
+  .loading,
+  .error {
+    max-width: 520px;
+    margin: 50px auto;
+    padding: 18px;
+    border-radius: 14px;
+    background: white;
+    box-shadow: var(--shadow);
+    text-align: center;
+    font-weight: 700;
+  }
+  
+  .error {
+    border: 1px solid #fecaca;
+    color: var(--danger);
+  }
+  
+  /* Mobile */
+  @media (max-width: 520px) {
+    .checkout-container {
+      margin: 24px 12px;
+      padding: 18px;
+    }
+  
+    .expiry-cvv {
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+  }
+  

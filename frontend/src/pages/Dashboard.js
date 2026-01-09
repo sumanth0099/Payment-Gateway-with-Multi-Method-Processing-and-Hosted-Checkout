@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getDashboardStats } from "../api";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,41 +17,83 @@ export default function Dashboard() {
     }
 
     getDashboardStats()
-      .then(setData)
-      .catch(console.error);
+      .then((stats) => {
+        setData(stats);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, [navigate]);
 
-  if (!data) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading Dashboard...</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return <div>Error loading data</div>;
+  }
 
   return (
-    <div data-test-id="dashboard" style={{ padding: 30 }}>
-      {/* API Credentials */}
-      <div data-test-id="api-credentials">
-        <div>
-          <label>API Key</label>
-          <span data-test-id="api-key">{data.api_key}</span>
-        </div>
+    <div className="dashboard-container" data-test-id="dashboard">
+      {/* Header */}
+      <div className="dashboard-header">
+        <h1>Merchant Dashboard</h1>
+        <Link to="/dashboard/transactions" className="transactions-link">
+          View Transactions →
+        </Link>
+      </div>
 
-        <div>
+      {/* API Credentials */}
+      <div className="credentials-card" data-test-id="api-credentials">
+        <h3>API Credentials</h3>
+        <div className="credential-item">
+          <label>API Key</label>
+          <code data-test-id="api-key" className="api-value">
+            {data.api_key}
+          </code>
+          <button 
+            className="copy-btn" 
+            onClick={() => navigator.clipboard.writeText(data.api_key)}
+            title="Copy to clipboard"
+          >
+            📋
+          </button>
+        </div>
+        <div className="credential-item">
           <label>API Secret</label>
-          <span data-test-id="api-secret">{data.api_secret}</span>
+          <code data-test-id="api-secret" className="api-value">
+            {data.api_secret}
+          </code>
+          <button 
+            className="copy-btn" 
+            onClick={() => navigator.clipboard.writeText(data.api_secret)}
+            title="Copy to clipboard"
+          >
+            📋
+          </button>
         </div>
       </div>
 
-      <hr />
-
       {/* Stats */}
-      <div data-test-id="stats-container">
-        <div data-test-id="total-transactions">
-          {data.total_transactions}
+      <div className="stats-container" data-test-id="stats-container">
+        <div className="stat-card total-transactions" data-test-id="total-transactions">
+          <div className="stat-number">{data.total_transactions}</div>
+          <div className="stat-label">Total Transactions</div>
         </div>
-
-        <div data-test-id="total-amount">
-          ₹{(data.total_amount / 100).toLocaleString("en-IN")}
+        <div className="stat-card total-amount" data-test-id="total-amount">
+          <div className="stat-number">₹{(data.total_amount / 100).toLocaleString("en-IN")}</div>
+          <div className="stat-label">Total Amount</div>
         </div>
-
-        <div data-test-id="success-rate">
-          {data.success_rate}%
+        <div className="stat-card success-rate" data-test-id="success-rate">
+          <div className="stat-number">{data.success_rate}%</div>
+          <div className="stat-label">Success Rate</div>
         </div>
       </div>
     </div>
