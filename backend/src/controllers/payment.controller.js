@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const pool = require("../config/db");
 const validateVpa = require("../utils/validateVpa");
 const luhnCheck = require("../utils/luhnCheck");
 const detectCardNetwork = require("../utils/detectCardNetwork");
@@ -6,24 +6,41 @@ const validateExpiry = require("../utils/validateExpiry");
 const generatePaymentId = require("../utils/generatePaymentId");
 
 function sleep(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 exports.createPayment = async (req, res) => {
-  const { order_id, method, vpa, card } = req.body;
+  const orderId = req.body.orderid || req.body.order_id;
+  const method = req.body.method;
+  const vpa = req.body.vpa;
+  const card = req.body.card;
+
   const merchantId = req.merchant.id;
 
   try {
+    if (!orderId) {
+      return res.status(400).json({
+        error: { code: "BADREQUESTERROR", description: "orderid is required" },
+      });
+    }
+
+    if (!method) {
+      return res.status(400).json({
+        error: { code: "BADREQUESTERROR", description: "method is required" },
+      });
+    }
+
     /* ---------------- Order validation ---------------- */
     const orderRes = await pool.query(
       `SELECT id, amount, currency, merchant_id
-       FROM orders WHERE id = $1`,
-      [order_id]
+       FROM orders
+       WHERE id = $1`,
+      [orderId]
     );
 
     if (orderRes.rowCount === 0 || orderRes.rows[0].merchant_id !== merchantId) {
       return res.status(404).json({
-        error: { code: "NOT_FOUND_ERROR", description: "Order not found" }
+        error: { code: "NOTFOUNDERROR", description: "Order not found" },
       });
     }
 
@@ -36,39 +53,43 @@ exports.createPayment = async (req, res) => {
     if (method === "upi") {
       if (!vpa || !validateVpa(vpa)) {
         return res.status(400).json({
-          error: { code: "INVALID_VPA", description: "VPA format invalid" }
+          error: { code: "INVALIDVPA", description: "VPA format invalid" },
         });
       }
-    }
-
-    else if (method === "card") {
+    } else if (method === "card") {
       if (!card) {
         return res.status(400).json({
-          error: { code: "INVALID_CARD", description: "Card details missing" }
+          error: { code: "INVALIDCARD", description: "Card details missing" },
         });
       }
 
-      const { number, expiry_month, expiry_year } = card;
+      const number = card.number;
+      const expiryMonth = card.expirymonth ?? card.expiry_month;
+      const expiryYear = card.expiryyear ?? card.expiry_year;
+
+      if (!number) {
+        return res.status(400).json({
+          error: { code: "INVALIDCARD", description: "Card number is required" },
+        });
+      }
 
       if (!luhnCheck(number)) {
         return res.status(400).json({
-          error: { code: "INVALID_CARD", description: "Card validation failed" }
+          error: { code: "INVALIDCARD", description: "Card validation failed" },
         });
       }
 
-      if (!validateExpiry(expiry_month, expiry_year)) {
+      if (!validateExpiry(expiryMonth, expiryYear)) {
         return res.status(400).json({
-          error: { code: "EXPIRED_CARD", description: "Card expiry date invalid" }
+          error: { code: "EXPIREDCARD", description: "Card expiry date invalid" },
         });
       }
 
       cardNetwork = detectCardNetwork(number);
       cardLast4 = number.replace(/[\s-]/g, "").slice(-4);
-    }
-
-    else {
+    } else {
       return res.status(400).json({
-        error: { code: "BAD_REQUEST_ERROR", description: "Invalid payment method" }
+        error: { code: "BADREQUESTERROR", description: "Invalid payment method" },
       });
     }
 
@@ -78,10 +99,7 @@ exports.createPayment = async (req, res) => {
 
     while (exists) {
       paymentId = generatePaymentId();
-      const chk = await pool.query(
-        "SELECT 1 FROM payments WHERE id = $1",
-        [paymentId]
-      );
+      const chk = await pool.query("SELECT 1 FROM payments WHERE id = $1", [paymentId]);
       exists = chk.rowCount > 0;
     }
 
@@ -102,26 +120,27 @@ exports.createPayment = async (req, res) => {
         method,
         method === "upi" ? vpa : null,
         cardNetwork,
-        cardLast4
+        cardLast4,
       ]
     );
 
     const payment = insertRes.rows[0];
 
-    /* ---------------- Processing delay ---------------- */
-    const testMode = process.env.TEST_MODE === "true";
+    /* ---------------- Processing delay + test mode ---------------- */
+    const testMode = process.env.TESTMODE === "true";
 
-    let delay = testMode
-      ? parseInt(process.env.TEST_PROCESSING_DELAY || "1000")
-      : Math.floor(Math.random() * 5000) + 5000; // 5–10s
-
-    await sleep(delay);
-
+    const delay = testMode
+    ? parseInt(process.env.TESTPROCESSINGDELAY, 10)
+    : Math.floor(Math.random() * 1000) + 2000; // 2–3s
+  
+  await sleep(delay);
+  
     /* ---------------- Success / failure ---------------- */
     let success;
 
     if (testMode) {
-      success = process.env.TEST_PAYMENT_SUCCESS !== "false";
+      // default true if not set; false only when explicitly "false"
+      success = process.env.TESTPAYMENTSUCCESS !== "false";
     } else {
       const rate = method === "upi" ? 0.9 : 0.95;
       success = Math.random() < rate;
@@ -138,7 +157,7 @@ exports.createPayment = async (req, res) => {
       await pool.query(
         `UPDATE payments
          SET status='failed',
-             error_code='PAYMENT_FAILED',
+             error_code='PAYMENTFAILED',
              error_description='Payment processing failed',
              updated_at=NOW()
          WHERE id=$1`,
@@ -147,25 +166,27 @@ exports.createPayment = async (req, res) => {
     }
 
     /* ---------------- Final response ---------------- */
-    return res.status(201).json({
+    const response = {
       id: payment.id,
-      order_id: payment.order_id,
+      orderid: payment.order_id,
       amount: payment.amount,
       currency: payment.currency,
       method: payment.method,
       status: success ? "success" : "failed",
-      ...(method === "upi" && { vpa: payment.vpa }),
-      ...(method === "card" && {
-        card_network: payment.card_network,
-        card_last4: payment.card_last4
-      }),
-      created_at: payment.created_at
-    });
+      createdat: payment.created_at,
+    };
 
+    if (method === "upi") response.vpa = payment.vpa;
+    if (method === "card") {
+      response.cardnetwork = payment.card_network;
+      response.cardlast4 = payment.card_last4;
+    }
+
+    return res.status(201).json(response);
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      error: { code: "INTERNAL_SERVER_ERROR", description: "Something went wrong" }
+      error: { code: "INTERNALERROR", description: "Something went wrong" },
     });
   }
 };
@@ -186,44 +207,34 @@ exports.getPaymentById = async (req, res) => {
 
     if (result.rowCount === 0) {
       return res.status(404).json({
-        error: {
-          code: "NOT_FOUND_ERROR",
-          description: "Payment not found",
-        },
+        error: { code: "NOTFOUNDERROR", description: "Payment not found" },
       });
     }
 
     const p = result.rows[0];
 
-    // Build response dynamically based on method
     const response = {
       id: p.id,
-      order_id: p.order_id,
+      orderid: p.order_id,
       amount: p.amount,
       currency: p.currency,
       method: p.method,
       status: p.status,
-      created_at: p.created_at,
-      updated_at: p.updated_at,
+      createdat: p.created_at,
+      updatedat: p.updated_at,
     };
 
-    if (p.method === "upi") {
-      response.vpa = p.vpa;
-    }
-
+    if (p.method === "upi") response.vpa = p.vpa;
     if (p.method === "card") {
-      response.card_network = p.card_network;
-      response.card_last4 = p.card_last4;
+      response.cardnetwork = p.card_network;
+      response.cardlast4 = p.card_last4;
     }
 
     return res.status(200).json(response);
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      error: {
-        code: "INTERNAL_SERVER_ERROR",
-        description: "Something went wrong",
-      },
+      error: { code: "INTERNALERROR", description: "Something went wrong" },
     });
   }
 };

@@ -1,7 +1,12 @@
+import { BrowserRouter } from "react-router-dom";
 import Checkout from "./pages/Checkout";
 
 function App() {
-  return <Checkout />;
+  return (
+    <BrowserRouter>
+      <Checkout />
+    </BrowserRouter>
+  );
 }
 
 export default App;

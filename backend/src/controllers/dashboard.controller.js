@@ -23,15 +23,16 @@ exports.getDashboardStats = async (req, res) => {
 
     // Fixed: exact field names from spec merchants table
     const merchantResult = await pool.query(
-      `SELECT apikey, apisecret FROM merchants WHERE id = $1`, // Fixed: apikey/apisecret not api_key/api_secret [file:1]
+      `SELECT id, api_key AS "apikey", api_secret AS "apisecret" 
+      FROM merchants WHERE id = $1`, // Fixed: apikey/apisecret not api_key/api_secret [file:1]
       [merchantId]
     );
 
     const merchant = merchantResult.rows[0];
 
     res.json({
-      api_key: merchant ? merchant.apikey : 'keytestabc123', // Fallback if not seeded
-      api_secret: merchant ? merchant.apisecret : 'secrettestxyz789',
+      api_key: merchant?.api_key || 'key_test_abc123',
+      api_secret: merchant?.api_secret || 'secret_test_xyz789',
       total_transactions: total,
       total_amount: totalAmount,
       success_rate: successRate,
