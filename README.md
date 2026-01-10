@@ -1,4 +1,3 @@
-```md
 # Payment Gateway (UPI + Card) + Hosted Checkout
 
 A Dockerized payment gateway simulation (Razorpay/Stripe-style) that lets **merchants** create orders and accept **UPI/Card** payments, and lets **customers** complete payments on a hosted checkout page.
@@ -75,7 +74,6 @@ payment-gateway/
     Dockerfile
     package.json
     src/...
-```
 
 ---
 
