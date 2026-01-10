@@ -1,0 +1,2 @@
+# Force bash scripts to always use LF (prevents /bin/sh^M issues in Docker/Linux)
+*.sh text eol=lf
