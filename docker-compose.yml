@@ -25,7 +25,7 @@ services:
       DATABASE_URL: postgresql://gateway_user:gateway_pass@postgres:5432/payment_gateway
       PORT: 8000
       # Optional (for evaluator deterministic behavior)
-      TESTMODE: "true"
+      TESTMODE: "false"
       TESTPAYMENTSUCCESS: "true"
       TESTPROCESSINGDELAY: "2000"
     depends_on:
