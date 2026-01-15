@@ -6,7 +6,8 @@ const API_BASE = "http://localhost:8000";
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get("orderid");
+  const orderId = searchParams.get("order_id") || searchParams.get("orderid"); // optional fallback
+
 
   const [order, setOrder] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("upi");
